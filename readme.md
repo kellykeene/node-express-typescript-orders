@@ -2,6 +2,12 @@
 
 Javascript using NodeJs, Typescript, Jest
 
+npm init -y
+
+OpenAPI
+Installed openapi-typescript
+npm run generate-types      // 
+
 Gitignore
 npx gitignore node          // generates the .gitignore file using a standard node template
 
@@ -22,3 +28,4 @@ tests
 
 ### Improvements (for production)  
 
+CORS, input validation (zero-ZOD), file uploads, API browser, OpenAPI spec generator
