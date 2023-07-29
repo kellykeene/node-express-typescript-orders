@@ -1,4 +1,4 @@
-##Background
+## Background  
 Zipline both flies autonomous vehicles and operates a full-fledged logistics system. We run operations out of our distribution centers, which we call "nests." At a given nest, we have an inventory of medical supplies and a team of operators who manage that inventory and process orders from doctors.
 
 We’re going to build a lightweight inventory management and order processing system. This system will
@@ -10,7 +10,7 @@ There are a number of reasons that we might not be able to directly ship the ord
 - The order is too big to fit in a single shipment (our max package size is 1.8kg)
 - We could be out of the requested product, in which case the order may be only partially filled, and remaining items would not be able to be shipped until a restock happens
 
-##Problem
+## Problem  
 Let's build the backend of the system. Work in your best language (Python preferred). In the interest of respecting your time, we ask that you spend no more than **two hours**​ total (this time may be split up over multiple working sessions).
 
 - Assume that the system starts with an "empty" inventory.
