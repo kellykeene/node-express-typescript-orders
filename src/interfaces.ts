@@ -1,0 +1,25 @@
+export interface Product {
+    product_id: number;
+    product_name: string;
+    mass_g: number;
+}
+
+export interface OrderLineItem {
+    product_id: number;
+    quantity: number;
+}
+
+export interface Order {
+    order_id: number;
+    requested: OrderLineItem[];
+}
+
+export interface Shipment {
+    order_id: number;
+    shipped: OrderLineItem[];
+}
+
+export interface Restock {
+    product_id: number;
+    quantity: number;
+}

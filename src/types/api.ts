@@ -5,14 +5,97 @@
 
 
 export interface paths {
-  "/articles": {
-    /** Get all articles */
+  "/products": {
+    /** Get all products */
     get: {
       responses: {
-        /** @description A list of articles */
+        /** @description Fetch the full list of products */
         200: {
           content: {
-            "application/json": components["schemas"]["Article"][];
+            "application/json": components["schemas"]["Product"][];
+          };
+        };
+      };
+    };
+    /** Create a new product */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Product"];
+        };
+      };
+      responses: {
+        /** @description Add a new product to the inventory */
+        201: {
+          content: {
+            "application/json": components["schemas"]["Product"];
+          };
+        };
+      };
+    };
+  };
+  "/orders": {
+    /** Get all orders */
+    get: {
+      responses: {
+        /** @description Fetch the full list of orders */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Order"][];
+          };
+        };
+      };
+    };
+  };
+  "/process_order": {
+    /** Process an order */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Order"];
+        };
+      };
+      responses: {
+        /** @description Processed order */
+        201: {
+          content: {
+            "application/json": components["schemas"]["Order"];
+          };
+        };
+      };
+    };
+  };
+  "/process_restock": {
+    /** Restocks a product */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Restock"];
+        };
+      };
+      responses: {
+        /** @description Restocked product */
+        201: {
+          content: {
+            "application/json": components["schemas"]["Restock"];
+          };
+        };
+      };
+    };
+  };
+  "/ship_package": {
+    /** Ship a /ship_package */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Shipment"];
+        };
+      };
+      responses: {
+        /** @description Shipped package */
+        201: {
+          content: {
+            "application/json": components["schemas"]["Shipment"];
           };
         };
       };
@@ -24,10 +107,26 @@ export type webhooks = Record<string, never>;
 
 export interface components {
   schemas: {
-    Article: {
-      id: string;
-      title: string;
-      content: string;
+    Product: {
+      product_id: number;
+      product_name: string;
+      mass_g: number;
+    };
+    OrderLineItem: {
+      product_id: number;
+      quantity: number;
+    };
+    Order: {
+      order_id: number;
+      requested: components["schemas"]["OrderLineItem"][];
+    };
+    Shipment: {
+      order_id?: number;
+      shipped?: components["schemas"]["OrderLineItem"][];
+    };
+    Restock: {
+      product_id: number;
+      quantity: number;
     };
   };
   responses: never;
