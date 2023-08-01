@@ -16,7 +16,6 @@ export interface OrderLineItem {
 export interface Order {
     order_id: number;
     requested: OrderLineItem[];
-    status: string; // pending, partially fulfilled or fulfilled
 }
 
 export interface Shipment {

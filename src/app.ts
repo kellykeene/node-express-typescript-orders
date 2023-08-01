@@ -1,19 +1,11 @@
 import express from "express";
-import { v4 as uuidv4 } from "uuid";
-import { Order, OrderLineItem, Product, ProductRestock, Shipment } from "./interfaces";
-import { init_catalog, process_restock, process_order, getProducts, getDeferredShipments, addProduct } from "./inventory";
+import { init_catalog, process_restock, process_order, getProducts, getDeferredOrders, addProduct } from "./inventory";
 
 // 
 // Setup express server and json parser middleware
 // 
 const app = express();
 app.use(express.json());
-
-// 
-// In-memory store for orders submitted by hospitals
-// 
-let orders: Order[] = [];
-
 
 //
 // API endpoint for initializing the product catalog
@@ -89,10 +81,10 @@ app.post("/products", (req, res) => {
 });
 
 // 
-// API endpoint for getting all deferred shipments
+// API endpoint for getting all deferred orders
 // 
-app.get("/deferredshipments", (req, res) => {
-    res.status(200).json(getDeferredShipments());
+app.get("/deferredorders", (req, res) => {
+    res.status(200).json(getDeferredOrders());
 });
 
 
