@@ -20,7 +20,7 @@ export interface Order {
 
 export interface Shipment {
     order_id: number;
-    products: OrderLineItem[];
+    shipped: OrderLineItem[];
 }
 
 export interface ProductRestock {

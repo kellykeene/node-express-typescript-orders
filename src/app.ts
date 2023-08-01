@@ -1,5 +1,5 @@
 import express from "express";
-import { init_catalog, process_restock, process_order, getProducts, getDeferredOrders, addProduct } from "./inventory";
+import { initCatalog, processRestock, processOrder } from "./inventory";
 
 // 
 // Setup express server and json parser middleware
@@ -8,20 +8,20 @@ const app = express();
 app.use(express.json());
 
 //
-// API endpoint for initializing the product catalog
+// API endpoint for processing an incoming order
 // Usage: 
-//  POST http://localhost:3000/init_catalog
+//  POST http://localhost:3000/process_order
 //  Content-Type: application/json
-//  Sample payload: [{"mass_g": 700, "product_name": "RBC A+ Adult", "product_id": 0}, {"mass_g": 700, "product_name": "RBC B+ Adult", "product_id": 1}, {"mass_g": 750, "product_name": "RBC AB+ Adult", "product_id": 2}, {"mass_g": 680, "product_name": "RBC O- Adult", "product_id": 3}, {"mass_g": 350, "product_name": "RBC A+ Child", "product_id": 4}, {"mass_g": 200, "product_name": "RBC AB+ Child", "product_id": 5}, {"mass_g": 120, "product_name": "PLT AB+", "product_id": 6}, {"mass_g": 80, "product_name": "PLT O+", "product_id": 7}, {"mass_g": 40, "product_name": "CRYO A+", "product_id": 8}, {"mass_g": 80, "product_name": "CRYO AB+", "product_id": 9}, {"mass_g": 300, "product_name": "FFP A+", "product_id": 10}, {"mass_g": 300, "product_name": "FFP B+", "product_id": 11}, {"mass_g": 300, "product_name": "FFP AB+", "product_id": 12}]
+//  Sample payload: {"order_id": 123, "requested": [{"product_id": 0, "quantity": 2}, {"product_id": 10, "quantity": 4}]}
 //  
-app.post("/init_catalog", (req, res) => {
+app.post("/process_order", (req, res) => {
     if (Object.keys(req.body).length === 0) {
-        return res.status(400).json({ error: "No products found in request body" });
+        return res.status(400).json({ error: "No order found in request body" });
     }
+    
+    processOrder(req.body);
 
-    init_catalog(req.body);
-
-    res.status(201).json(req.body);
+    res.status(201).send("Process Order was successfully called. Check Console for messaging.");
 });
 
 //
@@ -36,57 +36,15 @@ app.post("/process_restock", (req, res) => {
         return res.status(400).json({ error: "No product restocks found in request body" });
     }
 
-    process_restock(req.body);
+    processRestock(req.body);
 
-    // Return the list of products that have been restocked
-    res.status(201).send("Products have been restocked");
-});
-
-//
-// API endpoint for processing an incoming order
-// Usage: 
-//  POST http://localhost:3000/process_order
-//  Content-Type: application/json
-//  Sample payload: {"order_id": 123, "requested": [{"product_id": 0, "quantity": 2}, {"product_id": 10, "quantity": 4}]}
-//  
-app.post("/process_order", (req, res) => {
-    if (Object.keys(req.body).length === 0) {
-        return res.status(400).json({ error: "No order found in request body" });
-    }
-    
-    process_order(req.body);
-
-    res.status(201).send("Order has been processed");
-});
-
-
-// 
-// API endpoint for getting all products
-// 
-app.get("/products", (req, res) => {
-    res.status(200).json(getProducts());
+    res.status(201).send("Process Restock was successfully called. Check Console for messaging.");
 });
 
 // 
-// API endpoint for adding a new product
+// Initialize catalog and inventory
 // 
-app.post("/products", (req, res) => {
-    if (Object.keys(req.body).length === 0) {
-        return res.status(400).json({ error: "No product found in request body" });
-    }
-
-    addProduct(req.body);
-
-    res.status(201).send("Product has been added");
-});
-
-// 
-// API endpoint for getting all deferred orders
-// 
-app.get("/deferredorders", (req, res) => {
-    res.status(200).json(getDeferredOrders());
-});
-
+initCatalog('[{"mass_g": 700, "product_name": "RBC A+ Adult", "product_id": 0}, {"mass_g": 700, "product_name": "RBC B+ Adult", "product_id": 1}, {"mass_g": 750, "product_name": "RBC AB+ Adult", "product_id": 2}, {"mass_g": 680, "product_name": "RBC O- Adult", "product_id": 3}, {"mass_g": 350, "product_name": "RBC A+ Child", "product_id": 4}, {"mass_g": 200, "product_name": "RBC AB+ Child", "product_id": 5}, {"mass_g": 120, "product_name": "PLT AB+", "product_id": 6}, {"mass_g": 80, "product_name": "PLT O+", "product_id": 7}, {"mass_g": 40, "product_name": "CRYO A+", "product_id": 8}, {"mass_g": 80, "product_name": "CRYO AB+", "product_id": 9}, {"mass_g": 300, "product_name": "FFP A+", "product_id": 10}, {"mass_g": 300, "product_name": "FFP B+", "product_id": 11}, {"mass_g": 300, "product_name": "FFP AB+", "product_id": 12}]');
 
 // 
 // Start the server
@@ -95,3 +53,8 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is listening on port ${ PORT }`);
 });
+
+// 
+// Exporting for tests
+// 
+export default app;
