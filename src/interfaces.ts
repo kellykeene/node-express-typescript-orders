@@ -4,6 +4,10 @@ export interface Product {
     mass_g: number;
 }
 
+export interface Catalog {
+    products: Product[];
+}
+
 export interface OrderLineItem {
     product_id: number;
     quantity: number;
@@ -12,14 +16,19 @@ export interface OrderLineItem {
 export interface Order {
     order_id: number;
     requested: OrderLineItem[];
+    status: string; // pending, partially fulfilled or fulfilled
 }
 
 export interface Shipment {
     order_id: number;
-    shipped: OrderLineItem[];
+    products: OrderLineItem[];
 }
 
-export interface Restock {
+export interface ProductRestock {
     product_id: number;
     quantity: number;
+}
+
+export interface Inventory {
+    [key: number]: number; // product_id: quantity
 }

@@ -90,6 +90,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Shipment'
+  /init_catalog:
+    post:
+      summary: Load catalog /init_catalog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Catalog'
+      responses:
+        '201':
+          description: Loaded catalog
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Catalog'
 components:
   schemas:
     Product:
@@ -105,6 +121,13 @@ components:
         - product_id
         - product_name
         - mass_g
+    Catalog:
+      type: object
+      properties:
+        products:
+          type: array
+          items: 
+            $ref: '#/components/schemas/Product'
     OrderLineItem:
       type: object
       properties:

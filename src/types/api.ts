@@ -101,6 +101,24 @@ export interface paths {
       };
     };
   };
+  "/init_catalog": {
+    /** Load catalog /init_catalog */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Catalog"];
+        };
+      };
+      responses: {
+        /** @description Loaded catalog */
+        201: {
+          content: {
+            "application/json": components["schemas"]["Catalog"];
+          };
+        };
+      };
+    };
+  };
 }
 
 export type webhooks = Record<string, never>;
@@ -111,6 +129,9 @@ export interface components {
       product_id: number;
       product_name: string;
       mass_g: number;
+    };
+    Catalog: {
+      products?: components["schemas"]["Product"][];
     };
     OrderLineItem: {
       product_id: number;
