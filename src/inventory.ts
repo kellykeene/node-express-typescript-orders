@@ -116,58 +116,63 @@ const createShipments = (order: Order) => {
         if (inventory[product_id] !== undefined) {
 
             const weight = catalog[product_id].mass_g;          // get the weight of the product from the catalog
-            const quantityInStock = inventory[product_id] || 0; // get the quantity in stock
 
-            // determine how many units of the requested quantity are in stock for this product
-            let shippableQuantity = (quantityInStock > 0) ? Math.min(quantity, quantityInStock) : 0;
-            
-            // determine how many units of the requested quantity are not in stock
-            const unshippableQuantity = (quantity - quantityInStock);
+            if (weight < PACKAGE_WEIGHT_MAXIMUM_G) {
+                const quantityInStock = inventory[product_id] || 0; // get the quantity in stock
 
-            // for each unit in the shippable quantity amount
-            while (shippableQuantity > 0) {
+                // determine how many units of the requested quantity are in stock for this product
+                let shippableQuantity = (quantityInStock > 0) ? Math.min(quantity, quantityInStock) : 0;
+                
+                // determine how many units of the requested quantity are not in stock
+                const unshippableQuantity = (quantity - quantityInStock);
 
-                // determine if the current cumulative weight of the shipment + the weight of this single product 
-                // is within range of the max weight of a shipment
-                if ((currentWeight + weight) <= PACKAGE_WEIGHT_MAXIMUM_G) {
+                // for each unit in the shippable quantity amount
+                while (shippableQuantity > 0) {
 
-                    // determine the quantity that we can add to this shipment
-                    // - determine how many of these products could fit in the shipment (rounded down)
-                    // - take the minimum quantity that can fit in the shipment
-                    const roomLeftInShipment = Math.floor((PACKAGE_WEIGHT_MAXIMUM_G - currentWeight) / weight);
-                    const quantityToAdd = Math.min(shippableQuantity, roomLeftInShipment);
-                    
-                    // add this quantity of products to the shipment
-                    lineItems.push({ product_id, quantity: quantityToAdd });
-                    
-                    // update the current weight of the shipment
-                    currentWeight += weight * quantityToAdd;
+                    // determine if the current cumulative weight of the shipment + the weight of this single product 
+                    // is within range of the max weight of a shipment
+                    if ((currentWeight + weight) <= PACKAGE_WEIGHT_MAXIMUM_G) {
 
-                    // decrement the shipable quantity
-                    shippableQuantity -= quantityToAdd;
+                        // determine the quantity that we can add to this shipment
+                        // - determine how many of these products could fit in the shipment (rounded down)
+                        // - take the minimum quantity that can fit in the shipment
+                        const roomLeftInShipment = Math.floor((PACKAGE_WEIGHT_MAXIMUM_G - currentWeight) / weight);
+                        const quantityToAdd = Math.min(shippableQuantity, roomLeftInShipment);
+                        
+                        // add this quantity of products to the shipment
+                        lineItems.push({ product_id, quantity: quantityToAdd });
+                        
+                        // update the current weight of the shipment
+                        currentWeight += weight * quantityToAdd;
 
-                    // update the inventory
-                    inventory[product_id] -= quantityToAdd;
+                        // decrement the shipable quantity
+                        shippableQuantity -= quantityToAdd;
 
-                } else {
-                    // the cumulative weight with this product added would exceed the max weight of a shipment
-                    // ship the current package
-                    const shipment: Shipment = {
-                        order_id: order.order_id,
-                        shipped: [...lineItems]
-                    };
+                        // update the inventory
+                        inventory[product_id] -= quantityToAdd;
 
-                    shipPackage(shipment);
+                    } else {
+                        // the cumulative weight with this product added would exceed the max weight of a shipment
+                        // ship the current package
+                        const shipment: Shipment = {
+                            order_id: order.order_id,
+                            shipped: [...lineItems]
+                        };
 
-                    // clear the line items and curent cumulative weight
-                    lineItems = [];
-                    currentWeight = 0;
+                        shipPackage(shipment);
+
+                        // clear the line items and curent cumulative weight
+                        lineItems = [];
+                        currentWeight = 0;
+                    }
                 }
-            }
 
-            // if there are not enough units of this product in stock, add them to the deferred order to process later
-            if (unshippableQuantity > 0) {
-                deferredOrder.requested.push({product_id, quantity: unshippableQuantity});
+                // if there are not enough units of this product in stock, add them to the deferred order to process later
+                if (unshippableQuantity > 0) {
+                    deferredOrder.requested.push({product_id, quantity: unshippableQuantity});
+                }
+            } else {
+                console.log(`PRODUCT ID ${JSON.stringify(product_id)} UNIT WEIGHT EXCEEDS MAXIMUM WEIGHT.`);
             }
         } else {
             console.log(`PRODUCT ID ${JSON.stringify(product_id)} IN ORDER IS CORRUPT.`);

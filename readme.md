@@ -19,14 +19,18 @@
 - Emmited Typescript files:     dist
 - Tests                         tests/**.test.ts  
  
-### Running the project  
-#### Start the server
+#### Running the Project  
+##### Install dependencies (package.json)
+```npm install```
+
+##### Start the server
 ```npm start```
   
-#### Tests
+##### Tests
+*There are only a few unit tests at the moment.*
 ```npm run test```
   
-#### API endpoints  
+##### API endpoints  
 POST http://localhost:3000/process_order  
 Content-Type: application/json  
   
@@ -41,8 +45,8 @@ Content-Type: application/json
 [{"product_id": 0, "quantity": 30}, {"product_id": 1, "quantity": 25}, {"product_id": 2, "quantity": 25}, {"product_id": 3, "quantity": 12}, {"product_id": 4, "quantity": 15}, {"product_id": 5, "quantity": 10}, {"product_id": 6, "quantity": 8}, {"product_id": 7, "quantity": 8}, {"product_id": 8, "quantity": 20}, {"product_id": 9, "quantity": 10}, {"product_id": 10, "quantity": 5}, {"product_id": 11, "quantity": 5}, {"product_id": 12, "quantity": 5}]
 ```  
   
-### Test cases  
-#### Happy path
+#### Test cases  
+##### Happy path
 1. Submit an order that contains quantities of products that the inventory can support
 2. Submit an order that contains quantities of products that the inventory can only partially support
 3. Submit an order that contains no quantities of products that the inventory can support (inventory is out/empty)
@@ -50,11 +54,11 @@ Content-Type: application/json
 5. Restock the inventory
 6. Restock the insufficient inventory when deferred orders exist
 
-#### Edge cases
+##### Edge cases
 1. Submit an order that contains a product with weight larger than the max 1.8kg
 2. Submit an order with no requested products
 
-### Improvements (for production)  
+#### Improvements (for production)  
 - Security: Lockdown the API endpoints using JWT or OAuth etc
 - Add/Configure CORS: cors npm package
 - Improve upon unit testing, practice TDD
