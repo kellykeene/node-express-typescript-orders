@@ -58,10 +58,11 @@ Content-Type: application/json
 1. Submit an order that contains a product with weight larger than the max 1.8kg
 2. Submit an order with no requested products
 
-#### Improvements (for production)  
+#### Improvements (for production)
 - Security: Lockdown the API endpoints using JWT or OAuth etc
 - Add/Configure CORS: cors npm package
-- Improve upon unit testing, practice TDD
+- Improve upon unit testing, add many tests to get to a decent code coverage
+- Practice TDD
 - Create a more consistent reporting system. For example, report back useful information to the API callers.
 - Improve error handling, perhaps using try/catch blocks where data validation is challenging (for example, incoming request body that is suppose to map to a type).
 - Replace console.logs with server-side logging that can be ingested by various tools for monitoring
