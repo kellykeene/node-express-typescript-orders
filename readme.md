@@ -1,25 +1,30 @@
 ### Zipline Inventory and Order Processing Challenge  
   
 #### Summary    
-+ This is an API project that uses NodeJs, Express, Typescript, and Jest. 
++ This is an API project that uses NodeJs, Express, Typescript, and Mocha/Chai. 
 
-+ I've added many console.log statements to track changing inventory, shipments, and deferred order processing. Viewing these messages via the console will probably be the easiest way to view changing data and logic.
++ My apologies, but I've added many console.log statements to track changing inventory, shipments, and deferred order processing. Viewing these messages via the console while the server is running will probably be the easiest way to view changing data and logic.
 
-#### Expectations/Assumptions
-1. init_catalog is called with the provided JSON on src/app.ts prior to starting the express server.
++ I am calling "init_catalog" on src/app.ts prior to starting the express server. If this needs to be an exposed API endpoint, we can easily add that in.  
+  
++ "init_catalog" loads the product catalog JSON provided in the assignment and is located in src/data/catalog.ts.
 
-2. The catalog, inventory, and deferred orders (or partial orders) are stored in-memory (src/inventory.ts).
++ The catalog, inventory, and deferred orders (or partial orders) are stored in-memory (defined on src/inventory.ts).
+ 
   
 #### Project Structure  
 - API server routes:            src/app.ts
 - Object interfaces/types:      src/interfaces.ts
 - Inventory business logic:     src/inventory.ts
 - Emmited Typescript files:     dist
-- Jest tests                    tests/app.test.ts
+- Tests                         tests/**.test.ts  
  
 ### Running the project  
-#### Startup
-To start the server, run ```npm start```
+#### Start the server
+```npm start```
+  
+#### Tests
+```npm run test```
   
 #### API endpoints  
 POST http://localhost:3000/process_order  
@@ -43,31 +48,24 @@ Content-Type: application/json
 3. Submit an order that contains no quantities of products that the inventory can support (inventory is out/empty)
 4. Submit an order prior to populating the inventory
 5. Restock the inventory
-6. Restock the insifficient inventory after trying to submit an order (deferred orders should go out)
+6. Restock the insufficient inventory when deferred orders exist
 
 #### Edge cases
-1. Attempt to order a product that has a weight larger than the max of 1.8kg
-2. Attempt to submit an order with no products
-3.  
+1. Submit an order that contains a product with weight larger than the max 1.8kg
+2. Submit an order with no requested products
 
 ### Improvements (for production)  
-Javascript naming conventions for function and variable/property names
-OpenAPI - Swagger docs
-Package disbursement algorithm (greedy algorithm) to use the least number of packages for an Order by splitting the items into packages that weigh as close to 1.8kg as possible.
-Error handling
-Logging
-Database
-Tests - Practice using TDD
-JWT or OAuth security, CORS, input validation (zero-ZOD), file uploads, API browser, OpenAPI spec generator, prettier, eslint, typescript lint
-OpenAPI Design-first approach
-
-Add security: JWT or OAuth etc
-Add CORS Support: cors npm package
-Better project organization: Create a seperate file for each endpoint, organized by domain
-
-Advantages/Disadvantages of using Express? Typescript? NodeJs/Python?
-
-Study coding conventions for NodeJs APIs
-
-
+- Security: Lockdown the API endpoints using JWT or OAuth etc
+- Add/Configure CORS: cors npm package
+- Improve upon unit testing, practice TDD
+- Create a more consistent reporting system. For example, report back useful information to the API callers.
+- Improve error handling, perhaps using try/catch blocks where data validation is challenging (for example, incoming request body that is suppose to map to a type).
+- Replace console.logs with server-side logging that can be ingested by various tools for monitoring
+- Adhere to javascript naming conventions for the property names within the interfaces.
+- Look for an opportunity to combine the products store with the inventory store via the interfaces/extensibility/inheritance
+- Rewrite the createShipments logic to try using the least number of shipments for an Order by distributing the products within each shipment by the weights that add up as close to 1.8kg as possible first. I think this would be a greedy algorithm.
+- Introduce a design-first module that allows us to maintain an OpenAPI spec and generate code from it.
+- Add support for Swagger API docs
+- Use a database instead of in-memory stores
+- Separate some of the tasks into their own functions. For example, possibly use events to know when to try sending deferred orders after a restock. There are too many things happening in one function right now.
 

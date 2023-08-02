@@ -1,48 +1,56 @@
-import request from "supertest";
+import chai from "chai";
+import chaiHttp from "chai-http";
 import app from "../src/app";
 
-describe ('abc', () => {
-    it ('cbd', () => {
-        expect(1).toBe(1);
-    }); 
-});
+// Configure chai
+chai.use(chaiHttp);
+chai.should();
 
-// Tests for the /process_restock endpoint
-describe("POST /process_restock", () => {
-    it("should return 201 Created", (done) => {
-        request(app).post("/process_restock")
-            .send([
-                {
-                    "product_id": 0,
-                    "quantity": 30
-                },
-                {
-                    "product_id": 1,
-                    "quantity": 25
-                }
-            ])
-            .expect(201, done);
+describe("API Server endpoints", () => {
+    describe("POST /process_restock", () => {
+        it("should successfully call the process_restock API endpoint", (done) => {
+             chai.request(app)
+                 .post("/process_restock")
+                 .send([
+                    {
+                        "product_id": 0,
+                        "quantity": 3
+                    },
+                    {
+                        "product_id": 1,
+                        "quantity": 21
+                    }
+                ])
+                .end((err, res) => {
+                    res.should.have.status(201);
+                    res.body.should.be.a('object');
+                    done();
+                });
+        });
+    });
+
+    describe("POST /process_order", () => {
+        it("should successfully call the process_order API endpoint", (done) => {
+            chai.request(app)
+                .post("/process_order")
+                .send({
+                    "order_id": 123, 
+                    "requested": [
+                        {
+                            "product_id": 0, 
+                            "quantity": 2
+                        }, 
+                        {
+                            "product_id": 10, 
+                            "quantity": 4
+                        }
+                    ]
+                })
+               .end((err, res) => {
+                   res.should.have.status(201);
+                   res.body.should.be.a('object');
+                   done();
+               });
+       });
     });
 });
-
-
-// describe("GET /products", () => {
-//     it("should return 200 OK", (done) => {
-//         request(app).get("/products")
-//             .expect(200, done);
-//     });
-// });
-
-// describe("POST /products", () => {
-//     it("should return false from assert when no message is found", (done) => {
-//         request(app).post("/products")
-//             .field("name", "John Doe")
-//             .field("email", "john@me.com")
-//             .end(function(err, res) {
-//                 expect(res.error).to.be.false;
-//                 done();
-//             })
-//             .expect(302);
-
-//     });
-// });

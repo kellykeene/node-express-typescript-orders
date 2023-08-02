@@ -8,19 +8,19 @@ const PACKAGE_WEIGHT_MAXIMUM_G = 1800; // 1.8kg
 // 
 // In-memory store for product catalog
 // 
-let catalog: Product[] = [];
+export let catalog: Product[] = [];
 
 // 
 // In-memory map for product inventory
 //  key: product_id
 //  value: quantity
 // 
-let inventory: Inventory = {};
+export let inventory: Inventory = {};
 
 // 
 // In-memory store for unfulfilled orders
 // 
-let deferredOrders: Order[] = [];
+export let deferredOrders: Order[] = [];
 
 
 // 
@@ -28,17 +28,17 @@ let deferredOrders: Order[] = [];
 // - Initialize catalog store
 // - Initialize inventory store
 // 
-export const initCatalog = (productInfo: string) => {
+export const initCatalog = (productInfo: Product[]) => {
     
-    const products: Product[] = productInfo ? JSON.parse(productInfo.trim()) : [];
+    const products: Product[] = productInfo || [];
 
     catalog.push(...products);
     catalog.forEach((product) => {
         inventory[product.product_id] = 0; // Initialize quantities to 0
     });
 
-    console.log(`CATALOG: ${JSON.stringify(products)}`);
-    console.log(`INVENTORY: ${JSON.stringify(inventory)}`);
+    console.log(`CATALOG LOADED: ${JSON.stringify(products)}`);
+    console.log(`INVENTORY INITIALIZED: ${JSON.stringify(inventory)}`);
 };
 
 // 
@@ -60,10 +60,11 @@ export const processRestock = (restocks: ProductRestock[]) => {
         }
     });
 
-    console.log(`INVENTORY RESTOCK: ${JSON.stringify(inventory)}`);
+    console.log(`INVENTORY RESTOCKED: ${JSON.stringify(inventory)}`);
 
     // Retry shipping any pending orders/shipments
     if (deferredOrders.length > 0) {
+        console.log(`Shipping deferred orders: ${JSON.stringify(deferredOrders)}`);
         deferredOrders.forEach((order) => {
             createShipments(order);
         });
@@ -86,7 +87,7 @@ export const processOrder = (order: Order) => {
 // 
 const shipPackage = (shipment: Shipment) => {
     if (shipment) {
-        console.log(`A package has shipped: ${JSON.stringify(shipment)}`);
+        console.log(`SHIPMENT: ${JSON.stringify(shipment)}`);
     } else {
         console.log("No shipment was supplied to this call.");
     }
@@ -110,60 +111,66 @@ const createShipments = (order: Order) => {
     // for each line item in this order...
     for (const lineitem of order.requested) {
 
-        const { product_id, quantity } = lineitem;          // destructure the props out of the line item into (for better readability)
-        const weight = catalog[product_id].mass_g;          // get the weight of the product from the catalog
-        const quantityInStock = inventory[product_id] || 0; // get the quantity in stock
+        const { product_id, quantity } = lineitem;
 
-        // determine how many units of the requested quantity are in stock for this product
-        let shippableQuantity = (quantityInStock > 0) ? Math.min(quantity, quantityInStock) : 0;
-        
-        // determine how many units of the requested quantity are not in stock
-        const unshippableQuantity = (quantity - quantityInStock);
+        if (inventory[product_id] !== undefined) {
 
-        // for each unit in the shippable quantity amount
-        while (shippableQuantity > 0) {
+            const weight = catalog[product_id].mass_g;          // get the weight of the product from the catalog
+            const quantityInStock = inventory[product_id] || 0; // get the quantity in stock
 
-            // determine if the current cumulative weight of the shipment + the weight of this single product 
-            // is within range of the max weight of a shipment
-            if ((currentWeight + weight) <= PACKAGE_WEIGHT_MAXIMUM_G) {
+            // determine how many units of the requested quantity are in stock for this product
+            let shippableQuantity = (quantityInStock > 0) ? Math.min(quantity, quantityInStock) : 0;
+            
+            // determine how many units of the requested quantity are not in stock
+            const unshippableQuantity = (quantity - quantityInStock);
 
-                // determine the quantity that we can add to this shipment
-                // - determine how many of these products could fit in the shipment (rounded down)
-                // - take the minimum quantity that can fit in the shipment
-                const roomLeftInShipment = Math.floor((PACKAGE_WEIGHT_MAXIMUM_G - currentWeight) / weight);
-                const quantityToAdd = Math.min(shippableQuantity, roomLeftInShipment);
-                
-                // add this quantity of products to the shipment
-                lineItems.push({ product_id, quantity: quantityToAdd });
-                
-                // update the current weight of the shipment
-                currentWeight += weight * quantityToAdd;
+            // for each unit in the shippable quantity amount
+            while (shippableQuantity > 0) {
 
-                // decrement the shipable quantity
-                shippableQuantity -= quantityToAdd;
+                // determine if the current cumulative weight of the shipment + the weight of this single product 
+                // is within range of the max weight of a shipment
+                if ((currentWeight + weight) <= PACKAGE_WEIGHT_MAXIMUM_G) {
 
-                // update the inventory
-                inventory[product_id] -= quantityToAdd;
+                    // determine the quantity that we can add to this shipment
+                    // - determine how many of these products could fit in the shipment (rounded down)
+                    // - take the minimum quantity that can fit in the shipment
+                    const roomLeftInShipment = Math.floor((PACKAGE_WEIGHT_MAXIMUM_G - currentWeight) / weight);
+                    const quantityToAdd = Math.min(shippableQuantity, roomLeftInShipment);
+                    
+                    // add this quantity of products to the shipment
+                    lineItems.push({ product_id, quantity: quantityToAdd });
+                    
+                    // update the current weight of the shipment
+                    currentWeight += weight * quantityToAdd;
 
-            } else {
-                // the cumulative weight with this product added would exceed the max weight of a shipment
-                // ship the current package
-                const shipment: Shipment = {
-                    order_id: order.order_id,
-                    shipped: [...lineItems]
-                };
+                    // decrement the shipable quantity
+                    shippableQuantity -= quantityToAdd;
 
-                shipPackage(shipment);
+                    // update the inventory
+                    inventory[product_id] -= quantityToAdd;
 
-                // clear the line items and curent cumulative weight
-                lineItems = [];
-                currentWeight = 0;
+                } else {
+                    // the cumulative weight with this product added would exceed the max weight of a shipment
+                    // ship the current package
+                    const shipment: Shipment = {
+                        order_id: order.order_id,
+                        shipped: [...lineItems]
+                    };
+
+                    shipPackage(shipment);
+
+                    // clear the line items and curent cumulative weight
+                    lineItems = [];
+                    currentWeight = 0;
+                }
             }
-        }
 
-        // if there are not enough units of this product in stock, add them to the deferred order to process later
-        if (unshippableQuantity > 0) {
-            deferredOrder.requested.push({product_id, quantity: unshippableQuantity});
+            // if there are not enough units of this product in stock, add them to the deferred order to process later
+            if (unshippableQuantity > 0) {
+                deferredOrder.requested.push({product_id, quantity: unshippableQuantity});
+            }
+        } else {
+            console.log(`PRODUCT ID ${JSON.stringify(product_id)} IN ORDER IS CORRUPT.`);
         }
     }
 
