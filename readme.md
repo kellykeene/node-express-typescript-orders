@@ -74,3 +74,25 @@ Content-Type: application/json
 - Use a database instead of in-memory stores
 - Separate some of the tasks into their own functions. For example, possibly use events to know when to try sending deferred orders after a restock. There are too many things happening in one function right now.
 
+#### Code Improvements
+##### General
+1. General project structure could be better organized to separate the API routes into an express routes file (use express router) for better readability and easier testing.
+   + created a routes/routes.ts file and moved all API endpoints into this file. Added calls to the business logic functions from here as well.
+   + 
+   +  
+
+
+
+##### src/app.ts (API interface)
+1. Use the Express router.
++ //
+
+1. Split the API up into separate files:
++ One file that handles the API calls to process_order
++ One file that handles the API calls to process_restock
++ Advatages would be...
+     + readability, 
+     + faster troubleshooting and issue resolution
+     + separation of concerns
+     + 
+
