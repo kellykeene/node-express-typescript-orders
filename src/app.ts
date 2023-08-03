@@ -1,6 +1,6 @@
 import express from "express";
-import orderRouter from "./routes/orders";
-import inventoryRouter from "./routes/inventory";
+import router from "./routes/orders";
+//import inventoryRouter from "./routes/inventory";
 import catalogData from "./data/catalog";
 import { initCatalog } from "./inventory";
 
@@ -11,10 +11,10 @@ const app = express();
 app.use(express.json);
 
 // Expose the process_order API endpoint
-app.use("/process_order", orderRouter);
+app.use("/process_order", router);
 
 // Expose the process_restock endpoint
-app.use("/process_restock", inventoryRouter);
+//app.use("/process_restock", inventoryRouter);
 
 // 
 // Initialize catalog and inventory

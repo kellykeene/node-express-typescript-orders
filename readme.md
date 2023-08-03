@@ -76,7 +76,9 @@ Content-Type: application/json
 
 #### Code Improvements
 ##### General
-1. General project structure could be better organized to separate the API routes into an express routes file (use express router) for better readability and easier testing.
+1. General project structure could be better organized to separate the code into modules
+
+
    + created a routes/routes.ts file and moved all API endpoints into this file. Added calls to the business logic functions from here as well.
    + 
    +  
