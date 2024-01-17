@@ -1,11 +1,9 @@
-### Zipline Inventory and Order Processing Challenge  
+### Test Inventory and Order Processing Challenge  
   
 #### Summary    
 + This is an API project that uses NodeJs, Express, Typescript, and Mocha/Chai. 
 
-+ My apologies, but I've added many console.log statements to track changing inventory, shipments, and deferred order processing. Viewing these messages via the console while the server is running will probably be the easiest way to view changing data and logic.
-
-+ I am calling "init_catalog" on src/app.ts prior to starting the express server. If this needs to be an exposed API endpoint, we can easily add that in.  
++ Viewing these messages via the console while the server is running will probably be the easiest way to view changing data and logic. 
   
 + "init_catalog" loads the product catalog JSON provided in the assignment and is located in src/data/catalog.ts.
 
@@ -27,7 +25,6 @@
 ```npm start```
   
 ##### Tests
-*There are only a few unit tests at the moment.*
 ```npm run test```
   
 ##### API endpoints  
@@ -73,4 +70,3 @@ Content-Type: application/json
 - Add support for Swagger API docs
 - Use a database instead of in-memory stores
 - Separate some of the tasks into their own functions. For example, possibly use events to know when to try sending deferred orders after a restock. There are too many things happening in one function right now.
-
