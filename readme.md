@@ -1,4 +1,4 @@
-### Test Inventory and Order Processing Challenge  
+### Inventory and Order Processing Test  
   
 #### Summary    
 + This is an API project that uses NodeJs, Express, Typescript, and Mocha/Chai. 
